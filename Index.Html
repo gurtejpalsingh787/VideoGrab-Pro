@@ -1,0 +1,525 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VideoGrab Pro - Instagram & Snapchat Video Downloader</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Poppins', sans-serif; }
+        .gradient-bg { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
+        .instagram-gradient { background: linear-gradient(45deg, #f09433 0%,#e6683c 25%,#dc2743 50%,#cc2366 75%,#bc1888 100%); }
+        .snapchat-gradient { background: linear-gradient(45deg, #fffc00 0%, #fffc00 100%); }
+        .glass-morphism { background: rgba(255, 255, 255, 0.25); backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.18); }
+        .download-card { transition: all 0.3s ease; transform: translateY(0); }
+        .download-card:hover { transform: translateY(-5px); box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1); }
+        .loading-spinner { animation: spin 1s linear infinite; }
+        @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+        .fade-in { animation: fadeIn 0.5s ease-in; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        .ad-banner { min-height: 100px; background: #f0f0f0; border: 2px dashed #ccc; }
+        .progress-bar { transition: width 0.3s ease; }
+    </style>
+</head>
+<body class="bg-gray-100">
+
+    <!-- Header -->
+    <header class="gradient-bg text-white py-4 sticky top-0 z-50 shadow-lg">
+        <div class="container mx-auto px-4">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center space-x-3">
+                    <div class="w-10 h-10 bg-white rounded-full flex items-center justify-center">
+                        <i class="fas fa-download text-purple-600 text-xl"></i>
+                    </div>
+                    <div>
+                        <h1 class="text-2xl font-bold">VideoGrab Pro</h1>
+                        <p class="text-sm opacity-90">Fast & Easy Video Downloader</p>
+                    </div>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <button id="languageToggle" class="bg-white bg-opacity-20 px-3 py-1 rounded-full text-sm">
+                        हिंदी / EN
+                    </button>
+                    <button id="themeToggle" class="bg-white bg-opacity-20 p-2 rounded-full">
+                        <i class="fas fa-moon"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="container mx-auto px-4 py-8 max-w-4xl">
+        
+        <!-- Hero Section -->
+        <div class="text-center mb-12">
+            <h2 class="text-4xl font-bold text-gray-800 mb-4">
+                <span class="instagram-gradient bg-clip-text text-transparent">Instagram</span> & 
+                <span class="snapchat-gradient bg-clip-text text-transparent">Snapchat</span> 
+                Video Downloader
+            </h2>
+            <p class="text-gray-600 text-lg mb-6">
+                डाउनलोड करें Videos, Photos, Stories, और Reels बिना किसी limit के। Fast, Safe & Free!
+            </p>
+            
+            <!-- Ad Banner 1 -->
+            <div class="ad-banner rounded-lg mb-8 flex items-center justify-center text-gray-500">
+                <div class="text-center">
+                    <i class="fas fa-ad text-3xl mb-2"></i>
+                    <p>Advertisement Space 1</p>
+                    <p class="text-sm">728x90 Banner Ad</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Download Section -->
+        <div class="bg-white rounded-2xl shadow-xl p-8 mb-8">
+            <div class="flex items-center justify-center space-x-6 mb-8">
+                <div class="flex items-center space-x-2 instagram-gradient text-white px-4 py-2 rounded-full">
+                    <i class="fab fa-instagram"></i>
+                    <span>Instagram</span>
+                </div>
+                <div class="text-gray-400">+</div>
+                <div class="flex items-center space-x-2 bg-yellow-400 text-black px-4 py-2 rounded-full">
+                    <i class="fab fa-snapchat-ghost"></i>
+                    <span>Snapchat</span>
+                </div>
+            </div>
+
+            <div class="space-y-6">
+                <div>
+                    <label class="block text-gray-700 font-semibold mb-2">Video/Photo URL डालें:</label>
+                    <div class="flex space-x-2">
+                        <input type="url" id="mediaUrl" 
+                               class="flex-1 px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                               placeholder="https://www.instagram.com/p/... या https://www.snapchat.com/...">
+                        <button id="pasteBtn" class="bg-gray-500 hover:bg-gray-600 text-white px-4 py-3 rounded-lg transition">
+                            <i class="fas fa-paste"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-gray-700 font-semibold mb-2">Quality:</label>
+                        <select id="quality" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500">
+                            <option value="hd">HD (1080p)</option>
+                            <option value="fhd">Full HD (1080p+)</option>
+                            <option value="4k">4K (2160p)</option>
+                            <option value="original">Original Quality</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-gray-700 font-semibold mb-2">Format:</label>
+                        <select id="format" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500">
+                            <option value="mp4">MP4 (Video)</option>
+                            <option value="jpg">JPG (Photo)</option>
+                            <option value="png">PNG (Photo)</option>
+                            <option value="gif">GIF (Animation)</option>
+                        </select>
+                    </div>
+                </div>
+
+                <button id="downloadBtn" class="w-full gradient-bg text-white py-4 px-6 rounded-lg font-semibold text-lg hover:opacity-90 transition flex items-center justify-center space-x-2">
+                    <i class="fas fa-download"></i>
+                    <span>Download करें</span>
+                </button>
+
+                <!-- Progress Bar -->
+                <div id="progressContainer" class="hidden">
+                    <div class="bg-gray-200 rounded-full h-3 mb-2">
+                        <div id="progressBar" class="progress-bar bg-purple-600 h-3 rounded-full" style="width: 0%"></div>
+                    </div>
+                    <p id="progressText" class="text-center text-gray-600">Downloading...</p>
+                </div>
+
+                <!-- Download Result -->
+                <div id="downloadResult" class="hidden fade-in"></div>
+            </div>
+        </div>
+
+        <!-- Features Section -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+            <div class="download-card bg-white rounded-xl p-6 text-center shadow-lg">
+                <div class="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <i class="fas fa-rocket text-blue-500 text-2xl"></i>
+                </div>
+                <h3 class="text-xl font-semibold mb-2">Super Fast</h3>
+                <p class="text-gray-600">Lightning fast download speeds के साथ instant downloads</p>
+            </div>
+            <div class="download-card bg-white rounded-xl p-6 text-center shadow-lg">
+                <div class="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <i class="fas fa-shield-alt text-green-500 text-2xl"></i>
+                </div>
+                <h3 class="text-xl font-semibold mb-2">100% Safe</h3>
+                <p class="text-gray-600">No malware, no viruses - completely secure downloads</p>
+            </div>
+            <div class="download-card bg-white rounded-xl p-6 text-center shadow-lg">
+                <div class="w-16 h-16 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <i class="fas fa-mobile-alt text-purple-500 text-2xl"></i>
+                </div>
+                <h3 class="text-xl font-semibold mb-2">Mobile Friendly</h3>
+                <p class="text-gray-600">All devices में perfectly work करता है</p>
+            </div>
+        </div>
+
+        <!-- Ad Banner 2 -->
+        <div class="ad-banner rounded-lg mb-8 flex items-center justify-center text-gray-500">
+            <div class="text-center">
+                <i class="fas fa-ad text-3xl mb-2"></i>
+                <p>Advertisement Space 2</p>
+                <p class="text-sm">300x250 Medium Rectangle</p>
+            </div>
+        </div>
+
+        <!-- Download History -->
+        <div class="bg-white rounded-2xl shadow-xl p-8 mb-8">
+            <div class="flex items-center justify-between mb-6">
+                <h3 class="text-2xl font-bold text-gray-800">Download History</h3>
+                <button id="clearHistory" class="text-red-500 hover:text-red-600">
+                    <i class="fas fa-trash"></i> Clear All
+                </button>
+            </div>
+            <div id="downloadHistory" class="space-y-4">
+                <div class="text-center text-gray-500 py-8">
+                    <i class="fas fa-history text-4xl mb-2"></i>
+                    <p>कोई download history नहीं है</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- How to Use -->
+        <div class="bg-white rounded-2xl shadow-xl p-8 mb-8">
+            <h3 class="text-2xl font-bold text-gray-800 mb-6">कैसे Use करें?</h3>
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+                <div class="text-center">
+                    <div class="w-12 h-12 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-3">
+                        <span class="text-purple-600 font-bold">1</span>
+                    </div>
+                    <h4 class="font-semibold mb-2">Copy Link</h4>
+                    <p class="text-gray-600 text-sm">Instagram या Snapchat से link copy करें</p>
+                </div>
+                <div class="text-center">
+                    <div class="w-12 h-12 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-3">
+                        <span class="text-purple-600 font-bold">2</span>
+                    </div>
+                    <h4 class="font-semibold mb-2">Paste URL</h4>
+                    <p class="text-gray-600 text-sm">यहाँ URL paste करें</p>
+                </div>
+                <div class="text-center">
+                    <div class="w-12 h-12 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-3">
+                        <span class="text-purple-600 font-bold">3</span>
+                    </div>
+                    <h4 class="font-semibold mb-2">Select Quality</h4>
+                    <p class="text-gray-600 text-sm">Quality और format choose करें</p>
+                </div>
+                <div class="text-center">
+                    <div class="w-12 h-12 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-3">
+                        <span class="text-purple-600 font-bold">4</span>
+                    </div>
+                    <h4 class="font-semibold mb-2">Download</h4>
+                    <p class="text-gray-600 text-sm">Download button पर click करें</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- FAQ Section -->
+        <div class="bg-white rounded-2xl shadow-xl p-8">
+            <h3 class="text-2xl font-bold text-gray-800 mb-6">Frequently Asked Questions</h3>
+            <div class="space-y-4">
+                <div class="border border-gray-200 rounded-lg">
+                    <button class="faq-toggle w-full px-6 py-4 text-left flex items-center justify-between hover:bg-gray-50">
+                        <span class="font-semibold">क्या यह free है?</span>
+                        <i class="fas fa-chevron-down"></i>
+                    </button>
+                    <div class="faq-content hidden px-6 pb-4">
+                        <p class="text-gray-600">जी हाँ, VideoGrab Pro completely free है। बस कुछ ads हैं जो हमें service maintain करने में help करते हैं।</p>
+                    </div>
+                </div>
+                <div class="border border-gray-200 rounded-lg">
+                    <button class="faq-toggle w-full px-6 py-4 text-left flex items-center justify-between hover:bg-gray-50">
+                        <span class="font-semibold">क्या login करना जरूरी है?</span>
+                        <i class="fas fa-chevron-down"></i>
+                    </button>
+                    <div class="faq-content hidden px-6 pb-4">
+                        <p class="text-gray-600">नहीं, आपको कोई login करने की जरूरत नहीं है। Direct URL paste करके download कर सकते हैं।</p>
+                    </div>
+                </div>
+                <div class="border border-gray-200 rounded-lg">
+                    <button class="faq-toggle w-full px-6 py-4 text-left flex items-center justify-between hover:bg-gray-50">
+                        <span class="font-semibold">कितनी files download कर सकते हैं?</span>
+                        <i class="fas fa-chevron-down"></i>
+                    </button>
+                    <div class="faq-content hidden px-6 pb-4">
+                        <p class="text-gray-600">कोई limit नहीं है! आप unlimited downloads कर सकते हैं।</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-gray-800 text-white py-8 mt-12">
+        <div class="container mx-auto px-4 text-center">
+            <div class="mb-6">
+                <div class="w-12 h-12 bg-purple-600 rounded-full flex items-center justify-center mx-auto mb-3">
+                    <i class="fas fa-download text-xl"></i>
+                </div>
+                <h4 class="text-xl font-bold">VideoGrab Pro</h4>
+                <p class="text-gray-400">Best Instagram & Snapchat Downloader</p>
+            </div>
+            
+            <!-- Ad Banner 3 -->
+            <div class="ad-banner rounded-lg mb-6 flex items-center justify-center text-gray-400">
+                <div class="text-center">
+                    <i class="fas fa-ad text-2xl mb-1"></i>
+                    <p class="text-sm">Footer Advertisement Space</p>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm text-gray-400 mb-6">
+                <a href="#" class="hover:text-white">Privacy Policy</a>
+                <a href="#" class="hover:text-white">Terms of Service</a>
+                <a href="#" class="hover:text-white">Contact Us</a>
+                <a href="#" class="hover:text-white">Help</a>
+            </div>
+            
+            <p class="text-gray-400 text-sm">
+                © 2024 VideoGrab Pro. All rights reserved. Made with ❤️ in India
+            </p>
+        </div>
+    </footer>
+
+    <!-- JavaScript -->
+    <script>
+        // DOM Elements
+        const mediaUrl = document.getElementById('mediaUrl');
+        const pasteBtn = document.getElementById('pasteBtn');
+        const downloadBtn = document.getElementById('downloadBtn');
+        const progressContainer = document.getElementById('progressContainer');
+        const progressBar = document.getElementById('progressBar');
+        const progressText = document.getElementById('progressText');
+        const downloadResult = document.getElementById('downloadResult');
+        const downloadHistory = document.getElementById('downloadHistory');
+        const clearHistory = document.getElementById('clearHistory');
+        const themeToggle = document.getElementById('themeToggle');
+        const languageToggle = document.getElementById('languageToggle');
+
+        // Download History Array
+        let downloads = JSON.parse(localStorage.getItem('downloads') || '[]');
+
+        // Paste button functionality
+        pasteBtn.addEventListener('click', async () => {
+            try {
+                const text = await navigator.clipboard.readText();
+                mediaUrl.value = text;
+            } catch (err) {
+                alert('Clipboard access denied. Please paste manually.');
+            }
+        });
+
+        // Download functionality
+        downloadBtn.addEventListener('click', () => {
+            const url = mediaUrl.value.trim();
+            if (!url) {
+                alert('Please enter a valid URL!');
+                return;
+            }
+
+            if (!isValidUrl(url)) {
+                alert('Please enter a valid Instagram or Snapchat URL!');
+                return;
+            }
+
+            simulateDownload(url);
+        });
+
+        // URL validation
+        function isValidUrl(url) {
+            const patterns = [
+                /instagram\.com/,
+                /snapchat\.com/,
+                /instagr\.am/
+            ];
+            return patterns.some(pattern => pattern.test(url));
+        }
+
+        // Simulate download process
+        function simulateDownload(url) {
+            const quality = document.getElementById('quality').value;
+            const format = document.getElementById('format').value;
+
+            // Show progress
+            progressContainer.classList.remove('hidden');
+            downloadResult.classList.add('hidden');
+            downloadBtn.disabled = true;
+            downloadBtn.innerHTML = '<i class="fas fa-spinner loading-spinner"></i> <span>Processing...</span>';
+
+            let progress = 0;
+            const interval = setInterval(() => {
+                progress += Math.random() * 20;
+                if (progress > 100) progress = 100;
+                
+                progressBar.style.width = progress + '%';
+                progressText.textContent = `Downloading... ${Math.round(progress)}%`;
+
+                if (progress >= 100) {
+                    clearInterval(interval);
+                    completeDownload(url, quality, format);
+                }
+            }, 200);
+        }
+
+        // Complete download
+        function completeDownload(url, quality, format) {
+            setTimeout(() => {
+                progressContainer.classList.add('hidden');
+                downloadBtn.disabled = false;
+                downloadBtn.innerHTML = '<i class="fas fa-download"></i> <span>Download करें</span>';
+
+                // Create download result
+                const fileName = `video_${Date.now()}.${format}`;
+                const downloadInfo = {
+                    url: url,
+                    fileName: fileName,
+                    quality: quality,
+                    format: format,
+                    timestamp: new Date().toLocaleString('hi-IN'),
+                    size: (Math.random() * 50 + 5).toFixed(1) + ' MB'
+                };
+
+                // Add to history
+                downloads.unshift(downloadInfo);
+                if (downloads.length > 10) downloads.pop();
+                localStorage.setItem('downloads', JSON.stringify(downloads));
+
+                // Show result
+                showDownloadResult(downloadInfo);
+                updateDownloadHistory();
+            }, 1000);
+        }
+
+        // Show download result
+        function showDownloadResult(info) {
+            downloadResult.innerHTML = `
+                <div class="bg-green-50 border border-green-200 rounded-lg p-6">
+                    <div class="flex items-center space-x-4">
+                        <div class="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center">
+                            <i class="fas fa-check text-green-600 text-xl"></i>
+                        </div>
+                        <div class="flex-1">
+                            <h4 class="font-semibold text-green-800">Download Successful!</h4>
+                            <p class="text-green-600">${info.fileName} (${info.size})</p>
+                        </div>
+                        <button onclick="downloadFile('${info.fileName}')" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg">
+                            <i class="fas fa-download"></i> Save
+                        </button>
+                    </div>
+                </div>
+            `;
+            downloadResult.classList.remove('hidden');
+        }
+
+        // Download file
+        function downloadFile(fileName) {
+            // Create a dummy download (in real app, this would be actual file)
+            const link = document.createElement('a');
+            link.href = 'data:text/plain;charset=utf-8,' + encodeURIComponent('This is a sample download file');
+            link.download = fileName;
+            link.click();
+        }
+
+        // Update download history
+        function updateDownloadHistory() {
+            if (downloads.length === 0) {
+                downloadHistory.innerHTML = `
+                    <div class="text-center text-gray-500 py-8">
+                        <i class="fas fa-history text-4xl mb-2"></i>
+                        <p>कोई download history नहीं है</p>
+                    </div>
+                `;
+                return;
+            }
+
+            downloadHistory.innerHTML = downloads.map((download, index) => `
+                <div class="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
+                    <div class="flex items-center space-x-3">
+                        <div class="w-10 h-10 bg-purple-100 rounded-full flex items-center justify-center">
+                            <i class="fas fa-${download.format === 'mp4' ? 'video' : 'image'} text-purple-600"></i>
+                        </div>
+                        <div>
+                            <p class="font-semibold">${download.fileName}</p>
+                            <p class="text-sm text-gray-600">${download.quality} • ${download.size} • ${download.timestamp}</p>
+                        </div>
+                    </div>
+                    <div class="flex items-center space-x-2">
+                        <button onclick="downloadFile('${download.fileName}')" class="text-purple-600 hover:text-purple-800">
+                            <i class="fas fa-download"></i>
+                        </button>
+                        <button onclick="removeFromHistory(${index})" class="text-red-500 hover:text-red-700">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Remove from history
+        function removeFromHistory(index) {
+            downloads.splice(index, 1);
+            localStorage.setItem('downloads', JSON.stringify(downloads));
+            updateDownloadHistory();
+        }
+
+        // Clear all history
+        clearHistory.addEventListener('click', () => {
+            if (confirm('सभी download history clear करना चाहते हैं?')) {
+                downloads = [];
+                localStorage.removeItem('downloads');
+                updateDownloadHistory();
+            }
+        });
+
+        // FAQ Toggle
+        document.querySelectorAll('.faq-toggle').forEach(toggle => {
+            toggle.addEventListener('click', () => {
+                const content = toggle.nextElementSibling;
+                const icon = toggle.querySelector('i');
+                
+                content.classList.toggle('hidden');
+                icon.classList.toggle('fa-chevron-down');
+                icon.classList.toggle('fa-chevron-up');
+            });
+        });
+
+        // Theme toggle
+        let isDarkMode = false;
+        themeToggle.addEventListener('click', () => {
+            isDarkMode = !isDarkMode;
+            document.body.classList.toggle('dark', isDarkMode);
+            themeToggle.innerHTML = isDarkMode ? '<i class="fas fa-sun"></i>' : '<i class="fas fa-moon"></i>';
+        });
+
+        // Language toggle (placeholder)
+        let isEnglish = false;
+        languageToggle.addEventListener('click', () => {
+            isEnglish = !isEnglish;
+            // This would implement full language switching in a real app
+            alert(isEnglish ? 'Language switched to English' : 'भाषा हिंदी में switch हो गई');
+        });
+
+        // Initialize
+        updateDownloadHistory();
+
+        // Add some demo ads loading
+        setTimeout(() => {
+            document.querySelectorAll('.ad-banner').forEach(ad => {
+                ad.style.background = 'linear-gradient(45deg, #ff6b6b, #4ecdc4)';
+                ad.innerHTML = '<div class="text-white text-center"><i class="fas fa-ad text-2xl mb-2"></i><p>Sample Advertisement</p><p class="text-sm">Click to learn more</p></div>';
+            });
+        }, 2000);
+    </script>
+</body>
+</html>
